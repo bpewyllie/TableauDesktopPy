@@ -48,9 +48,7 @@ class Workbook:
 
         return queries
 
-
     def get_excel(self):
-
         """
         Returns a list of excel and csv connections in the workbook.
         """
@@ -60,9 +58,7 @@ class Workbook:
 
         return files
 
-
     def get_onedrive(self):
-
         """
         Returns a list of onedrive connections in the workbook.
         """
@@ -93,19 +89,15 @@ class Workbook:
     #     )
     # )
 
+    #     return dbs
 
-#     return dbs
+    # def check_permissions(xml):
 
-
-# def check_permissions(xml):
-
-#     """
-#     Checks that the user has modified the default permissions for the workbook.
-#     """
-
+    #     """
+    #     Checks that the user has modified the default permissions for the workbook.
+    #     """
 
     def get_fonts(self):
-
         """
         Returns a list of fonts used in the workbook.
         """
@@ -115,9 +107,7 @@ class Workbook:
 
         return fonts
 
-
     def get_colors(self):
-
         """
         Returns dataframe of all colors and their associated elements in the workbook.
         """
@@ -144,7 +134,9 @@ class Workbook:
                     )
 
             # Get tooltip elements for each worksheet
-            text_search = sheet.xpath(".//formatted-text[./run[contains(@fontcolor, '#')]]")
+            text_search = sheet.xpath(
+                ".//formatted-text[./run[contains(@fontcolor, '#')]]"
+            )
             for text in text_search:
 
                 # Get fontcolors for each tooltip text element
@@ -166,9 +158,7 @@ class Workbook:
 
         return color_df
 
-
     def get_hidden_fields(self):
-
         """
         Returns list of all hidden fields in the workbook.
         """
