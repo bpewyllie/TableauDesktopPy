@@ -109,7 +109,7 @@ class Workbook:
 
     def get_colors(self):
         """
-        Returns dataframe of all colors and their associated elements in the workbook.
+        Returns dataframe of all individual colors and their associated elements in the workbook.
         """
 
         all_colors = []
@@ -157,6 +157,16 @@ class Workbook:
         ).sort_values(["Sheet", "Element"])
 
         return color_df
+
+    def get_color_palettes(self):
+        """
+        Returns list of all named color palettes used in the workbook.
+        """
+
+        search = self.xml.xpath("//encoding[@type='palette']")
+        palettes = list(set([color.attrib["palette"] for color in search]))
+
+        return palettes
 
     def get_hidden_fields(self):
         """
