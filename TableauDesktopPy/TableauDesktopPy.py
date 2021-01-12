@@ -163,7 +163,7 @@ class Workbook:
         Returns list of all named color palettes used in the workbook.
         """
 
-        search = self.xml.xpath("//encoding[@type='palette']")
+        search = self.xml.xpath("//encoding[@palette !='']")
         palettes = list(set([color.attrib["palette"] for color in search]))
 
         return palettes
