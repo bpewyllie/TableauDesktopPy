@@ -177,3 +177,23 @@ class Workbook:
         hidden_fields = list(set([col.attrib["name"] for col in search]))
 
         return hidden_fields
+
+    def get_images(self):
+        """
+        Returns list of all image paths in the workbook.
+        """
+
+        search = self.xml.xpath("//zone[@_.fcp.SetMembershipControl.false...type = 'bitmap']")
+        images = list(set([img.attrib["param"].lower() for img in search]))
+
+        return images
+
+    def get_shapes(self):
+        """
+        Returns list of all shape names in the workbook.
+        """
+
+        search = self.xml.xpath("//shape[@name != '']")
+        shapes = list(set([shape.attrib["name"].lower() for shape in search]))
+
+        return shapes
