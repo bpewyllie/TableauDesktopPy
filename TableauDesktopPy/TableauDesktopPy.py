@@ -207,7 +207,40 @@ class Workbook:
         regex = r"^\[|\]\Z"
 
         active_fields = list(set([col.attrib["caption"] for col in has_caption]))
-        active_fields += list(set([col.attrib["name"][1:-1] for col in search if col not in has_caption]))
+        active_fields += list(
+            set(
+                [
+                    re.sub(regex, "", col.attrib["name"])
+                    for col in search
+                    if col not in has_caption
+                ]
+            )
+        )
+
+        return sorted(active_fields)
+
+    def get_fields(self):
+        """
+        Returns list of all fields in the workbook.
+        """
+
+        # return captions for calculated fields, otherwise return name
+        has_caption = self.xml.xpath("//column[@caption and @name]")
+        search = self.xml.xpath("//column[@name]")
+
+        # replace brackets from field strings
+        regex = r"^\[|\]\Z"
+
+        fields = list(set([col.attrib["caption"] for col in has_caption]))
+        fields += list(
+            set(
+                [
+                    re.sub(regex, "", col.attrib["name"])
+                    for col in search
+                    if col not in has_caption
+                ]
+            )
+        )
 
         return sorted(fields)
 
