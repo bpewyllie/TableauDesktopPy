@@ -1,6 +1,7 @@
 from zipfile import ZipFile
 from lxml import etree
 import pandas as pd
+import re
 
 
 class Workbook:
@@ -177,10 +178,21 @@ class Workbook:
         has_caption = self.xml.xpath("//column[@caption and @hidden='true']")
         search = self.xml.xpath("//column[@hidden='true']")
 
-        hidden_fields = list(set([col.attrib["caption"] for col in has_caption]))
-        hidden_fields += list(set([col.attrib["name"][1:-1] for col in search if col not in has_caption]))
+        # replace brackets from field strings
+        regex = r"^\[|\]\Z"
 
-        return hidden_fields
+        hidden_fields = list(set([col.attrib["caption"] for col in has_caption]))
+        hidden_fields += list(
+            set(
+                [
+                    re.sub(regex, "", col.attrib["name"])
+                    for col in search
+                    if col not in has_caption
+                ]
+            )
+        )
+
+        return sorted(hidden_fields)
 
     def get_active_fields(self):
         """
@@ -191,17 +203,22 @@ class Workbook:
         has_caption = self.xml.xpath("//datasource-dependencies//column[@caption]")
         search = self.xml.xpath("//datasource-dependencies//column")
 
+        # replace brackets from field strings
+        regex = r"^\[|\]\Z"
+
         active_fields = list(set([col.attrib["caption"] for col in has_caption]))
         active_fields += list(set([col.attrib["name"][1:-1] for col in search if col not in has_caption]))
 
-        return active_fields
+        return sorted(fields)
 
     def get_images(self):
         """
         Returns list of all image paths in the workbook.
         """
 
-        search = self.xml.xpath("//zone[@_.fcp.SetMembershipControl.false...type = 'bitmap']")
+        search = self.xml.xpath(
+            "//zone[@_.fcp.SetMembershipControl.false...type = 'bitmap']"
+        )
         images = list(set([img.attrib["param"].lower() for img in search]))
 
         return images
