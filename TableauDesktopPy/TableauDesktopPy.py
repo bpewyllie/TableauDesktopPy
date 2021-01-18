@@ -182,6 +182,20 @@ class Workbook:
 
         return hidden_fields
 
+    def get_active_fields(self):
+        """
+        Returns list of all used fields in the workbook.
+        """
+
+        # return captions for calculated fields, otherwise return name
+        has_caption = self.xml.xpath("//datasource-dependencies//column[@caption]")
+        search = self.xml.xpath("//datasource-dependencies//column")
+
+        active_fields = list(set([col.attrib["caption"] for col in has_caption]))
+        active_fields += list(set([col.attrib["name"][1:-1] for col in search if col not in has_caption]))
+
+        return active_fields
+
     def get_images(self):
         """
         Returns list of all image paths in the workbook.
