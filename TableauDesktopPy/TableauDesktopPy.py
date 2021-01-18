@@ -173,8 +173,12 @@ class Workbook:
         Returns list of all hidden fields in the workbook.
         """
 
+        # return captions for calculated fields, otherwise return name
+        has_caption = self.xml.xpath("//column[@caption and @hidden='true']")
         search = self.xml.xpath("//column[@hidden='true']")
-        hidden_fields = list(set([col.attrib["name"] for col in search]))
+
+        hidden_fields = list(set([col.attrib["caption"] for col in has_caption]))
+        hidden_fields += list(set([col.attrib["name"][1:-1] for col in search if col not in has_caption]))
 
         return hidden_fields
 
