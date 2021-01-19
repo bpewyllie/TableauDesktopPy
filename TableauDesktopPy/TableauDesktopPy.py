@@ -166,53 +166,29 @@ class Workbook:
 
     def _get_hidden_fields(self):
         """
-        Returns list of all hidden fields in the workbook.
+        Returns list of all hidden fields and their datasources in the workbook.
         """
 
-        # return captions for calculated fields, otherwise return name
-        has_caption = self.xml.xpath("//column[@caption and @hidden='true']")
-        search = self.xml.xpath("//column[@hidden='true']")
+        datasources = self.xml.xpath("//datasource[./column[@caption or @name]]")
+        regex = r"^\[|\]\Z"  # replace brackets from field strings
+        fields = []
 
-        # replace brackets from field strings
-        regex = r"^\[|\]\Z"
+        for d in datasources:
 
-        hidden_fields = list(set([col.attrib["caption"] for col in has_caption]))
-        hidden_fields += list(
-            set(
-                [
-                    re.sub(regex, "", col.attrib["name"])
-                    for col in search
-                    if col not in has_caption
-                ]
-            )
-        )
+            # return captions for calculated fields, otherwise return name
+            has_caption = d.xpath("./column[@caption and @name and @hidden='true']")
+            all_cols = d.xpath("./column[@name and @hidden='true']")
 
-        return sorted(hidden_fields)
+            fields += [
+                (col.attrib["caption"], d.attrib["caption"]) for col in has_caption
+            ]
+            fields += [
+                (re.sub(regex, "", col.attrib["name"]), d.attrib["caption"])
+                for col in all_cols
+                if col not in has_caption
+            ]
 
-    # def _get_active_fields(self):
-    #     """
-    #     Returns list of all used fields in the workbook.
-    #     """
-
-    #     # return captions for calculated fields, otherwise return name
-    #     has_caption = self.xml.xpath("//datasource-dependencies//column[@caption]")
-    #     search = self.xml.xpath("//datasource-dependencies//column")
-
-    #     # replace brackets from field strings
-    #     regex = r"^\[|\]\Z"
-
-    #     active_fields = list(set([col.attrib["caption"] for col in has_caption]))
-    #     active_fields += list(
-    #         set(
-    #             [
-    #                 re.sub(regex, "", col.attrib["name"])
-    #                 for col in search
-    #                 if col not in has_caption
-    #             ]
-    #         )
-    #     )
-
-    #     return sorted(active_fields)
+        return sorted(list(set(fields)))
 
     def _get_active_fields(self):
         """
