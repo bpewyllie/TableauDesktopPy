@@ -11,9 +11,21 @@ class Workbook:
 
     def __init__(self, filename):
         self.filename = filename
-        self.xml = self.get_xml()
+        self.xml = self._get_xml()
+        self.custom_sql = self._get_custom_sql()
+        self.excel = self._get_excel()
+        self.onedrive = self._get_onedrive()
+        self.connections = self._get_db_connections()
+        self.fonts = self._get_fonts()
+        self.colors = self._get_colors()
+        self.color_palettes = self._get_color_palettes()
+        self.fields = self._get_fields()
+        self.active_fields = self._get_active_fields()
+        self.hidden_fields = self._get_hidden_fields()
+        self.images = self._get_images()
+        self.shapes = self._get_shapes()
 
-    def get_xml(self):
+    def _get_xml(self):
         """
         Returns the xml of the given .twb or .twbx file.
         """
@@ -39,7 +51,7 @@ class Workbook:
 
             return xml
 
-    def get_custom_sql(self):
+    def _get_custom_sql(self):
         """
         Returns a list of all unique custom sql queries in the workbook.
         """
@@ -49,7 +61,7 @@ class Workbook:
 
         return queries
 
-    def get_excel(self):
+    def _get_excel(self):
         """
         Returns a list of excel and csv connections in the workbook.
         """
@@ -59,7 +71,7 @@ class Workbook:
 
         return files
 
-    def get_onedrive(self):
+    def _get_onedrive(self):
         """
         Returns a list of onedrive connections in the workbook.
         """
@@ -69,36 +81,18 @@ class Workbook:
 
         return onedrive
 
-    # def check_db_connections(xml):
+    def _get_db_connections(self):
 
-    #     """
-    #     Returns a list of other database connections in the workbook.
-    #     """
+        """
+        Returns a list of other database connections in the workbook.
+        """
 
-    #     search = xml.xpath("//connection[@dbname != '']")
-    # dbs = list(
-    #     set(
-    #         [
-    #             (
-    #                 db.attrib["dbname"],
-    #                 db.xpath(".//connection[@auto-extract !='']").attrib[
-    #                     "auto-extract"
-    #                 ],
-    #             )
-    #             for db in search
-    #         ]
-    #     )
-    # )
+        search = self.xml.xpath("//connection[@dbname]")
+        dbs = list(set([(db.attrib["dbname"],) for db in search]))
 
-    #     return dbs
+        return dbs
 
-    # def check_permissions(xml):
-
-    #     """
-    #     Checks that the user has modified the default permissions for the workbook.
-    #     """
-
-    def get_fonts(self):
+    def _get_fonts(self):
         """
         Returns a list of fonts used in the workbook.
         """
@@ -108,9 +102,10 @@ class Workbook:
 
         return fonts
 
-    def get_colors(self):
+    def _get_colors(self):
         """
-        Returns dataframe of all individual colors and their associated elements in the workbook.
+        Returns dataframe of all individual colors and their associated elements in
+        the workbook.
         """
 
         all_colors = []
@@ -159,7 +154,7 @@ class Workbook:
 
         return color_df
 
-    def get_color_palettes(self):
+    def _get_color_palettes(self):
         """
         Returns list of all named color palettes used in the workbook.
         """
@@ -169,7 +164,7 @@ class Workbook:
 
         return palettes
 
-    def get_hidden_fields(self):
+    def _get_hidden_fields(self):
         """
         Returns list of all hidden fields in the workbook.
         """
@@ -194,7 +189,7 @@ class Workbook:
 
         return sorted(hidden_fields)
 
-    def get_active_fields(self):
+    def _get_active_fields(self):
         """
         Returns list of all used fields in the workbook.
         """
@@ -219,7 +214,7 @@ class Workbook:
 
         return sorted(active_fields)
 
-    def get_fields(self):
+    def _get_fields(self):
         """
         Returns list of all fields in the workbook.
         """
@@ -244,7 +239,7 @@ class Workbook:
 
         return sorted(fields)
 
-    def get_images(self):
+    def _get_images(self):
         """
         Returns list of all image paths in the workbook.
         """
@@ -256,7 +251,7 @@ class Workbook:
 
         return images
 
-    def get_shapes(self):
+    def _get_shapes(self):
         """
         Returns list of all shape names in the workbook.
         """
