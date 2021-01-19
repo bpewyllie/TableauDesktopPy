@@ -260,3 +260,34 @@ class Workbook:
         shapes = list(set([shape.attrib["name"].lower() for shape in search]))
 
         return shapes
+
+    def hide_field(self, field: str, datasource: str = None, unhide: bool = True):
+        """
+        Hides field from workbook.
+        - datasource: if the datasource is not specified, all instances of the
+        provided field (for all datasources) will be hidden.
+        - unhide: by default, the function hides fields. Set unhide to True to
+        unhide fields from the workbook.
+        """
+
+        col_name = "[{}]".format(field)
+
+        # search for captions for calculated fields, otherwise search for name
+        if datasource == None:  # grab all instances of field
+            to_hide = self.xml.xpath(
+                "//datasource/column[@name = '{}']".format(col_name)
+            ) + self.xml.xpath("//datasource/column[@caption = '{}']".format(field))
+
+        else:  # grab all instances of datasource/field (should be length 1)
+            to_hide = self.xml.xpath(
+                "//datasource[@caption = '{}']/column[@name = '{}']".format(
+                    datasource, col_name
+                )
+            ) + self.xml.xpath(
+                "//datasource[@caption = '{}']/column[@caption = '{}']".format(
+                    datasource, field
+                )
+            )
+
+        for col in to_hide:
+            col.attrib["hidden"] = str(unhide).lower()
