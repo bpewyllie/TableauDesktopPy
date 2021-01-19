@@ -263,7 +263,7 @@ class Workbook:
 
     def hide_field(self, field: str, datasource: str = None, unhide: bool = True):
         """
-        Hides field from workbook.
+        Hides arbitrary field from workbook.
         - datasource: if the datasource is not specified, all instances of the
         provided field (for all datasources) will be hidden.
         - unhide: by default, the function hides fields. Set unhide to True to
