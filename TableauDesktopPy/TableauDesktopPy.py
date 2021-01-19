@@ -189,53 +189,88 @@ class Workbook:
 
         return sorted(hidden_fields)
 
+    # def _get_active_fields(self):
+    #     """
+    #     Returns list of all used fields in the workbook.
+    #     """
+
+    #     # return captions for calculated fields, otherwise return name
+    #     has_caption = self.xml.xpath("//datasource-dependencies//column[@caption]")
+    #     search = self.xml.xpath("//datasource-dependencies//column")
+
+    #     # replace brackets from field strings
+    #     regex = r"^\[|\]\Z"
+
+    #     active_fields = list(set([col.attrib["caption"] for col in has_caption]))
+    #     active_fields += list(
+    #         set(
+    #             [
+    #                 re.sub(regex, "", col.attrib["name"])
+    #                 for col in search
+    #                 if col not in has_caption
+    #             ]
+    #         )
+    #     )
+
+    #     return sorted(active_fields)
+
     def _get_active_fields(self):
         """
-        Returns list of all used fields in the workbook.
+        Returns list of all used fields and their datasources in the workbook.
         """
 
-        # return captions for calculated fields, otherwise return name
-        has_caption = self.xml.xpath("//datasource-dependencies//column[@caption]")
-        search = self.xml.xpath("//datasource-dependencies//column")
+        views = self.xml.xpath("//view[./datasource-dependencies//column[@caption or @name]]")
+        regex = r"^\[|\]\Z"  # replace brackets from field strings
+        fields = []
 
-        # replace brackets from field strings
-        regex = r"^\[|\]\Z"
+        for v in views:
 
-        active_fields = list(set([col.attrib["caption"] for col in has_caption]))
-        active_fields += list(
-            set(
-                [
-                    re.sub(regex, "", col.attrib["name"])
-                    for col in search
+            datasources = v.xpath("./datasource-dependencies[./column[@caption or @name]]")
+
+            for d in datasources:
+
+                # datasource-dependencies element does not show datasource name, just coded string
+                ds_name = d.attrib["datasource"]
+                ds_caption = v.xpath(".//datasource[@name='{}']".format(ds_name))[0].attrib["caption"]
+
+                # return captions for calculated fields, otherwise return name
+                has_caption = d.xpath("./column[@caption and @name]")
+                all_cols = d.xpath("./column[@name]")
+
+                fields += [
+                    (col.attrib["caption"], ds_caption) for col in has_caption
+                ]
+                fields += [
+                    (re.sub(regex, "", col.attrib["name"]), ds_caption)
+                    for col in all_cols
                     if col not in has_caption
                 ]
-            )
-        )
 
-        return sorted(active_fields)
+        return sorted(list(set(fields)))
 
     def _get_fields(self):
         """
-        Returns list of all fields in the workbook.
+        Returns list of all fields and their datasources in the workbook.
         """
 
-        # return captions for calculated fields, otherwise return name
-        has_caption = self.xml.xpath("//column[@caption and @name]")
-        search = self.xml.xpath("//column[@name]")
+        datasources = self.xml.xpath("//datasource[./column[@caption or @name]]")
+        regex = r"^\[|\]\Z"  # replace brackets from field strings
+        fields = []
 
-        # replace brackets from field strings
-        regex = r"^\[|\]\Z"
+        for d in datasources:
 
-        fields = list(set([col.attrib["caption"] for col in has_caption]))
-        fields += list(
-            set(
-                [
-                    re.sub(regex, "", col.attrib["name"])
-                    for col in search
-                    if col not in has_caption
-                ]
-            )
-        )
+            # return captions for calculated fields, otherwise return name
+            has_caption = d.xpath("./column[@caption and @name]")
+            all_cols = d.xpath("./column[@name]")
+
+            fields += [
+                (col.attrib["caption"], d.attrib["caption"]) for col in has_caption
+            ]
+            fields += [
+                (re.sub(regex, "", col.attrib["name"]), d.attrib["caption"])
+                for col in all_cols
+                if col not in has_caption
+            ]
 
         return sorted(fields)
 
