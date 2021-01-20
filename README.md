@@ -42,4 +42,4 @@ my_workbook = tdp.Workbook("C:\Users\bpewyllie\test_workbook.twbx")
 
 * ~~Create save method for overwriting workbooks~~
 
-* Create method for changing fonts
+* ~~Create method for changing fonts~~
