@@ -36,8 +36,10 @@ my_workbook = tdp.Workbook("C:\Users\bpewyllie\test_workbook.twbx")
 
 ## To do (for release 1.0.8)
 
-* Include datasource in parenthetical in any field-related attribute to overcome duplicate-named fields from different datasources
+* ~~Include datasource in parenthetical in any field-related attribute to overcome duplicate-named fields from different datasources~~
 
 * Create method for building workbook README file
 
-* Create save method for overwriting workbooks
+* ~~Create save method for overwriting workbooks~~
+
+* Create method for changing fonts

@@ -27,7 +27,7 @@ class Workbook:
         self.fields = self._get_fields()
         self.active_fields = self._get_active_fields()
 
-    @property # allow hidden fields attrib to get value after calling hide method
+    @property  # allow hidden fields attrib to get value after calling hide method
     def hidden_fields(self):
         return self._get_hidden_fields()
 
@@ -201,27 +201,32 @@ class Workbook:
         Returns list of all used fields and their datasources in the workbook.
         """
 
-        views = self.xml.xpath("//view[./datasource-dependencies//column[@caption or @name]]")
+        views = self.xml.xpath(
+            "//view[./datasource-dependencies//column[@caption or @name]]"
+        )
         regex = r"^\[|\]\Z"  # replace brackets from field strings
         fields = []
 
         for v in views:
 
-            datasources = v.xpath("./datasource-dependencies[./column[@caption or @name]]")
+            datasources = v.xpath(
+                "./datasource-dependencies[./column[@caption or @name]]"
+            )
 
             for d in datasources:
 
-                # datasource-dependencies element does not show datasource name, just coded string
+                # datasource-dependencies element does not show datasource name,
+                # just coded string
                 ds_name = d.attrib["datasource"]
-                ds_caption = v.xpath(".//datasource[@name='{}']".format(ds_name))[0].attrib["caption"]
+                ds_caption = v.xpath(".//datasource[@name='{}']".format(ds_name))[
+                    0
+                ].attrib["caption"]
 
                 # return captions for calculated fields, otherwise return name
                 has_caption = d.xpath("./column[@caption and @name]")
                 all_cols = d.xpath("./column[@name]")
 
-                fields += [
-                    (col.attrib["caption"], ds_caption) for col in has_caption
-                ]
+                fields += [(col.attrib["caption"], ds_caption) for col in has_caption]
                 fields += [
                     (re.sub(regex, "", col.attrib["name"]), ds_caption)
                     for col in all_cols
@@ -308,3 +313,27 @@ class Workbook:
 
         for col in to_hide:
             col.attrib["hidden"] = str(hide).lower()
+
+    def change_fonts(self, font_dict: dict = None):
+        """
+        
+        """
+
+    def save(self, filename: str = None):
+        """
+        Exports xml to Tableau workbook file.
+        - filename: destination and name of the file. filename must end with '.twb'. If no
+        filename is provided, the method overwrites self.filename.
+        """
+
+        if filename == None:
+            fn = self.filename
+        else:
+            fn = filename
+
+        if fn.endswith('.twb'):
+            tree = etree.ElementTree(self.xml)
+            tree.write(fn)
+
+        else:
+            print(filename, "does not have a .twb extension.")
