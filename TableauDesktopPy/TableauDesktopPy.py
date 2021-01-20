@@ -12,18 +12,24 @@ class Workbook:
     def __init__(self, filename):
         self.filename = filename
         self.xml = self._get_xml()
+
         self.custom_sql = self._get_custom_sql()
         self.excel = self._get_excel()
         self.onedrive = self._get_onedrive()
         self.connections = self._get_db_connections()
+
         self.fonts = self._get_fonts()
         self.colors = self._get_colors()
         self.color_palettes = self._get_color_palettes()
-        self.fields = self._get_fields()
-        self.active_fields = self._get_active_fields()
-        self.hidden_fields = self._get_hidden_fields()
         self.images = self._get_images()
         self.shapes = self._get_shapes()
+
+        self.fields = self._get_fields()
+        self.active_fields = self._get_active_fields()
+
+    @property # allow hidden fields attrib to get value after calling hide method
+    def hidden_fields(self):
+        return self._get_hidden_fields()
 
     def _get_xml(self):
         """
@@ -272,13 +278,13 @@ class Workbook:
 
         return shapes
 
-    def hide_field(self, field: str, datasource: str = None, unhide: bool = True):
+    def hide_field(self, field: str, datasource: str = None, hide: bool = True):
         """
         Hides arbitrary field from workbook.
         - datasource: if the datasource is not specified, all instances of the
         provided field (for all datasources) will be hidden.
-        - unhide: by default, the function hides fields. Set unhide to True to
-        unhide fields from the workbook.
+        - hide: by default, the function hides fields. Set hide to False to
+        unhide hidden fields from the workbook.
         """
 
         col_name = "[{}]".format(field)
@@ -301,4 +307,4 @@ class Workbook:
             )
 
         for col in to_hide:
-            col.attrib["hidden"] = str(unhide).lower()
+            col.attrib["hidden"] = str(hide).lower()
