@@ -18,7 +18,7 @@ class Workbook:
         self.onedrive = self._get_onedrive()
         self.connections = self._get_db_connections()
 
-        self.fonts = self._get_fonts()
+        #self.fonts = self._get_fonts()
         self.colors = self._get_colors()
         self.color_palettes = self._get_color_palettes()
         self.images = self._get_images()
@@ -27,9 +27,13 @@ class Workbook:
         self.fields = self._get_fields()
         self.active_fields = self._get_active_fields()
 
-    @property  # allow hidden fields attrib to get value after calling hide method
+    @property  # allow attribute to get value after calling hide fields method
     def hidden_fields(self):
         return self._get_hidden_fields()
+
+    @property
+    def fonts(self):
+        return self._get_fonts()
 
     def _get_xml(self):
         """
@@ -316,8 +320,18 @@ class Workbook:
 
     def change_fonts(self, font_dict: dict = None):
         """
-        
+        Replaces fonts in workbook xml.
+        - font_dict: mapping of current fonts to new fonts; if no font_dict is provided, 
+        all fonts are changed to Arial. 
         """
+
+        if font_dict == None:
+
+            fonts_to_change = self.xml.xpath("//format[@attr = 'font-family']")
+
+            for font in fonts_to_change:
+                font.attrib["value"] = "Arial"
+
 
     def save(self, filename: str = None):
         """
