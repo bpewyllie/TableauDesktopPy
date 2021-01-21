@@ -53,14 +53,14 @@ class Workbook:
 
             # unzip packaged workbooks to obtain xml
             if twb[-1] == "twb":
-                xml = etree.parse(self.filename).getroot()
+                xml = lxml.etree.parse(self.filename).getroot()
 
             else:
                 with open(self.filename, "rb") as binfile:
-                    twbx = ZipFile(binfile)
+                    twbx = zipfile.ZipFile(binfile)
                     name = [w for w in twbx.namelist() if w.find(".twb") != -1][0]
                     unzip = twbx.open(name)
-                    xml = etree.parse(unzip).getroot()
+                    xml = lxml.etree.parse(unzip).getroot()
 
             return xml
 
