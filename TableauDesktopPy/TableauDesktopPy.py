@@ -340,6 +340,68 @@ class Workbook:
             for font in fonts_to_change:
                 font.attrib["value"] = "Arial"
 
+        else:
+            for font in font_dict.keys():
+                font.attrib["value"] = font_dict[font]
+
+    def generate_readme(
+        self, save: bool = False, filename: str = None, note: str = None
+    ):
+        """
+        Generates a 'README' documentation string for the workbook populated with
+        metadata from attributes of the Workbook class.
+        - save: by default, the method outputs a string. Set save to True if you would
+        like to save a .txt file with the output.
+        - filename: if save is enabled, filename specifies the path and name. By
+        default, the file is saved as 'README.txt' in the same directory as the
+        workbook.
+        - note: a custom note to leave at the end of the README. If left blank, a short
+        message about the README is created.
+        """
+
+        with open("..\\assets\\README-twb.txt", "r") as readme_template:
+            text = readme_template.read()
+
+        # items to fill (in order):
+        # title, author, date, custom sql, db connections, file connections, note
+        title = self.filename.split(os.sep)[-1]
+
+        author = getpass.getuser()
+
+        date = datetime.datetime.fromtimestamp(
+            os.stat(self.filename).st_ctime
+        ).strftime("%Y-%m-%d-%H:%M:%S")
+
+        custom_sql = "There are {} custom SQL queries in this workbook.".format(
+            len(self.custom_sql)
+        )
+
+        # first element of c is name, second element is connection class (type)
+        clean_dbs = ["{} ({})".format(c[0], c[1]) for c in self.connections]
+        dbs = "\n   - ".join(clean_dbs)
+
+        files = "\n   - ".join(self.excel)
+
+        if note == None:
+            msg = "This documentation was generated automatically at {}".format(
+                datetime.datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
+            )
+        else:
+            msg = note
+
+        if filename == None:
+            fn = os.sep.join(self.filename.split(os.sep)[:-1]) + os.sep + "README.txt"
+        else:
+            fn = filename
+
+        if save:
+            with open(fn, "w") as workbook_readme:
+                workbook_readme.write(
+                    text.format(title, author, date, custom_sql, dbs, files, msg)
+                )
+            return ("File saved at " + fn)
+        else:
+            return text.format(title, author, date, custom_sql, dbs, files, msg)
 
     def save(self, filename: str = None):
         """
