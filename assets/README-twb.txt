@@ -13,8 +13,14 @@ Data
  - Connections to custom SQL queries:
    - {}
 
- - Connections to published data sources:
+ - All data connections:
    - {}
 
  - Connections to files:
    - {}
+
+------------------------------------------------------------
+
+Note
+
+{}
