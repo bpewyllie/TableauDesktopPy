@@ -18,7 +18,7 @@ class Workbook:
         self.onedrive = self._get_onedrive()
         self.connections = self._get_db_connections()
 
-        #self.fonts = self._get_fonts()
+        # self.fonts = self._get_fonts()
         self.colors = self._get_colors()
         self.color_palettes = self._get_color_palettes()
         self.images = self._get_images()
@@ -326,8 +326,8 @@ class Workbook:
     def change_fonts(self, font_dict: dict = None):
         """
         Replaces fonts in workbook xml.
-        - font_dict: mapping of current fonts to new fonts; if no font_dict is provided, 
-        all fonts are changed to Arial. 
+        - font_dict: mapping of current fonts to new fonts; if no font_dict is provided,
+        all fonts are changed to Arial.
         """
 
         if font_dict == None:
@@ -350,7 +350,7 @@ class Workbook:
         else:
             fn = filename
 
-        if fn.endswith('.twb'):
+        if fn.endswith(".twb"):
             tree = etree.ElementTree(self.xml)
             tree.write(fn)
 
