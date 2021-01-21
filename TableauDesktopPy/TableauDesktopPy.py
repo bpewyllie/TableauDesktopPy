@@ -80,7 +80,7 @@ class Workbook:
         """
 
         search = self.xml.xpath("//connection[@filename != '']")
-        files = list(set([xls.attrib["filename"].lower() for xls in search]))
+        files = list(set([xls.attrib["filename"] for xls in search]))
 
         return files
 
@@ -90,7 +90,7 @@ class Workbook:
         """
 
         search = self.xml.xpath("//connection[@cloudFileProvider='onedrive']")
-        onedrive = list(set([od.attrib["filename"].lower() for od in search]))
+        onedrive = list(set([od.attrib["filename"] for od in search]))
 
         return onedrive
 
@@ -101,7 +101,7 @@ class Workbook:
         """
 
         search = self.xml.xpath("//connection[@dbname]")
-        dbs = list(set([(db.attrib["dbname"],) for db in search]))
+        dbs = list(set([(db.attrib["dbname"], db.attrib["class"]) for db in search]))
 
         return dbs
 
@@ -161,7 +161,7 @@ class Workbook:
 
         unique_colors = list(set(all_colors))
 
-        color_df = pd.DataFrame(
+        color_df = pandas.DataFrame(
             unique_colors, columns=["Sheet", "Element", "Color"]
         ).sort_values(["Sheet", "Element"])
 
@@ -179,7 +179,8 @@ class Workbook:
 
     def _get_hidden_fields(self):
         """
-        Returns list of all hidden fields and their datasources in the workbook.
+        Returns list of all hidden fields and their datasources in the
+        workbook.
         """
 
         datasources = self.xml.xpath(
@@ -334,7 +335,6 @@ class Workbook:
         """
 
         if font_dict == None:
-
             fonts_to_change = self.xml.xpath("//format[@attr = 'font-family']")
 
             for font in fonts_to_change:
@@ -344,8 +344,8 @@ class Workbook:
     def save(self, filename: str = None):
         """
         Exports xml to Tableau workbook file.
-        - filename: destination and name of the file. filename must end with '.twb'. If no
-        filename is provided, the method overwrites self.filename.
+        - filename: destination and name of the file. filename must end with '.twb'. If
+        no filename is provided, the method overwrites self.filename.
         """
 
         if filename == None:
@@ -354,7 +354,7 @@ class Workbook:
             fn = filename
 
         if fn.endswith(".twb"):
-            tree = etree.ElementTree(self.xml)
+            tree = lxml.etree.ElementTree(self.xml)
             tree.write(fn)
 
         else:
