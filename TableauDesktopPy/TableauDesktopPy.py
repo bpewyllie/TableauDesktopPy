@@ -179,7 +179,9 @@ class Workbook:
         Returns list of all hidden fields and their datasources in the workbook.
         """
 
-        datasources = self.xml.xpath("//datasource[./column[@caption or @name]]")
+        datasources = self.xml.xpath(
+            "//datasource[@caption and ./column[@caption or @name]]"
+        )
         regex = r"^\[|\]\Z"  # replace brackets from field strings
         fields = []
 
@@ -205,37 +207,38 @@ class Workbook:
         Returns list of all used fields and their datasources in the workbook.
         """
 
-        views = self.xml.xpath(
-            "//view[./datasource-dependencies//column[@caption or @name]]"
-        )
+        # views = self.xml.xpath(("//view[.//datasource[@name != 'Parameters']]"))
         regex = r"^\[|\]\Z"  # replace brackets from field strings
         fields = []
 
-        for v in views:
+        # for v in views:
 
-            datasources = v.xpath(
-                "./datasource-dependencies[./column[@caption or @name]]"
+        datasources = self.xml.xpath(
+            (
+                "//datasource-dependencies[@datasource != 'Parameters' and "
+                "./column[@caption or @name]]"
             )
+        )
 
-            for d in datasources:
+        for d in datasources:
 
-                # datasource-dependencies element does not show datasource name,
-                # just coded string
-                ds_name = d.attrib["datasource"]
-                ds_caption = v.xpath(".//datasource[@name='{}']".format(ds_name))[
-                    0
-                ].attrib["caption"]
+            # datasource-dependencies element does not show datasource name,
+            # just coded string
+            ds_name = d.attrib["datasource"]
+            ds_caption = self.xml.xpath(
+                ".//datasource[@name='{}' and @caption]".format(ds_name)
+            )[0].attrib["caption"]
 
-                # return captions for calculated fields, otherwise return name
-                has_caption = d.xpath("./column[@caption and @name]")
-                all_cols = d.xpath("./column[@name]")
+            # return captions for calculated fields, otherwise return name
+            has_caption = d.xpath("./column[@caption and @name]")
+            all_cols = d.xpath("./column[@name]")
 
-                fields += [(col.attrib["caption"], ds_caption) for col in has_caption]
-                fields += [
-                    (re.sub(regex, "", col.attrib["name"]), ds_caption)
-                    for col in all_cols
-                    if col not in has_caption
-                ]
+            fields += [(col.attrib["caption"], ds_caption) for col in has_caption]
+            fields += [
+                (re.sub(regex, "", col.attrib["name"]), ds_caption)
+                for col in all_cols
+                if col not in has_caption
+            ]
 
         return sorted(list(set(fields)))
 
@@ -244,7 +247,9 @@ class Workbook:
         Returns list of all fields and their datasources in the workbook.
         """
 
-        datasources = self.xml.xpath("//datasource[./column[@caption or @name]]")
+        datasources = self.xml.xpath(
+            "//datasource[@caption and ./column[@caption or @name]]"
+        )
         regex = r"^\[|\]\Z"  # replace brackets from field strings
         fields = []
 
