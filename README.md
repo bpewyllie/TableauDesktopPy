@@ -53,3 +53,5 @@ my_workbook = tdp.Workbook("C:\Users\bpewyllie\test_workbook.twbx")
 * Ability to save workbooks to `.twbx` files
 
 * Create worksheet, datasource subclasses (long-term goal: allow more precise manipulation)
+
+* Create method for changing file paths of images and data files
