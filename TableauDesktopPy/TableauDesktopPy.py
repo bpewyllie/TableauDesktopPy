@@ -337,13 +337,15 @@ class Workbook:
         Replaces fonts in workbook xml.
         - default: default font to map all fonts to.
         - font_dict: mapping of current fonts to new fonts; if no font_dict is provided,
-        all fonts are changed to default argument.
+        all fonts are changed to default argument. font_dict requires a mapping from
+        "Default" to a new font if you want to replace default fonts that are not
+        mentioned explicitly. Otherwise, the font from the default argument is used.
         """
 
         if font_dict == None:
 
             fonts_1 = self.xml.xpath("//format[@attr = 'font-family']")
-            fonts_2 = self.xml.xpath("//run[@fontname]")
+            fonts_2 = self.xml.xpath("//run")
 
             for font in fonts_1:
                 font.attrib["value"] = default
@@ -351,7 +353,24 @@ class Workbook:
             for font in fonts_2:
                 font.attrib["fontname"] = default
 
+            # replace fonts that do not show up explicitly
+            styles = self.xml.xpath("//style-rule[@element]")
+            for style in styles:
+                if len(style.xpath("./format[@attr = 'font-family']")) == 0:
+                    style.insert(1, 
+                        lxml.etree.Element(
+                            "format", attrib={"attr": "font-family", "value": default}
+                        )
+                )
+
+            # formatted_texts = self.xml.xpath("//formatted-text")
+            # for text in formatted_texts:
+            #     text.insert(1, lxml.etree.Element("run", attrib={"fontname": default}))
+
         else:
+
+            if "Default" not in font_dict.keys():
+                font_dict["Default"] = default
 
             for old_font in font_dict.keys():
 
@@ -359,12 +378,35 @@ class Workbook:
                     "//format[@attr = 'font-family' and @value = '{}']".format(old_font)
                 )
                 fonts_2 = self.xml.xpath("//run[@fontname = '{}']".format(old_font))
+                fonts_3 = [x for x in self.xml.xpath("//run") if x not in fonts_2]
 
                 for font in fonts_1:
                     font.attrib["value"] = font_dict[old_font]
 
                 for font in fonts_2:
                     font.attrib["fontname"] = font_dict[old_font]
+
+                for font in fonts_3:
+                    font.attrib["fontname"] = font_dict["Default"]
+
+            # replace fonts that do not show up explicitly
+            styles = self.xml.xpath("//style-rule[@element]")
+            for style in styles:
+                if len(style.xpath("./format[@attr = 'font-family']")) == 0:
+                    style.insert(
+                        lxml.etree.ElementTree.Element(
+                            "format",
+                            attrib={"attr": "font-family", "value": font_dict["Default"]},
+                        )
+                    )
+
+            # formatted_texts = self.xml.xpath("//formatted-text")
+            # for text in formatted_texts:
+            #     text.insert(
+            #         lxml.etree.ElementTree.Element(
+            #             "run", attrib={"fontname": font_dict["Default"]}
+            #         )
+            #     )
 
     def generate_readme(
         self, save: bool = False, filename: str = None, note: str = None
