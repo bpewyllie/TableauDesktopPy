@@ -5,6 +5,7 @@ import re
 import getpass
 import os
 import datetime
+import pkg_resources
 
 
 class Workbook:
@@ -13,7 +14,7 @@ class Workbook:
     """
 
     def __init__(self, filename):
-        self.filename = filename
+        self.filename = os.path.normpath(filename)
         self.xml = self._get_xml()
 
         self.custom_sql = self._get_custom_sql()
@@ -380,7 +381,11 @@ class Workbook:
         message about the README is created.
         """
 
-        with open("..\\assets\\README-twb.txt", "r") as readme_template:
+        template_file = pkg_resources.resource_filename(
+            "TableauDesktopPy", "assets/README-twb.txt"
+        )
+
+        with open(template_file, "r") as readme_template:
             text = readme_template.read()
 
         # items to fill (in order):
