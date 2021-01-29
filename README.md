@@ -36,6 +36,16 @@ my_workbook = tdp.Workbook("C:\Users\bpewyllie\test_workbook.twbx")
 
 ## Release notes
 
+### 1.1.0 (1/29/2021)
+
+* Ability to save workbooks to `.twbx` files
+
+* Change default fonts of workbooks
+
+### 1.0.9 (1/22/2021)
+
+* Address README template not being accessible
+
 ### 1.0.8 (1/21/2021)
 
 * Include datasource in parenthetical in any field-related attribute to overcome duplicate-named fields from different datasources
@@ -48,9 +58,7 @@ my_workbook = tdp.Workbook("C:\Users\bpewyllie\test_workbook.twbx")
 
 * Fix some bugs with retrieving field names when parameters are present
 
-## To do (for release 1.0.9)
-
-* Ability to save workbooks to `.twbx` files
+## To do
 
 * Create worksheet, datasource subclasses (long-term goal: allow more precise manipulation)
 
