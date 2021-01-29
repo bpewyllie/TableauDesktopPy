@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="TableauDesktopPy",
-    version="1.0.8",
+    version="1.1.0",
     author="Brady Wyllie",
     author_email="bpewyllie@gmail.com",
     description="Tools for extracting metadata from Tableau Desktop workbook files.",
@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/bpewyllie/tableaudesktoppy",
     packages=setuptools.find_packages(),
+    package_data={'TableauDesktopPy': ['assets/*.txt']},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
