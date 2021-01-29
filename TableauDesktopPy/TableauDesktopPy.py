@@ -425,7 +425,7 @@ class Workbook:
                 workbook_readme.write(
                     text.format(title, author, date, custom_sql, dbs, files, msg)
                 )
-            return ("File saved at " + fn)
+            return "File saved at " + fn
         else:
             return text.format(title, author, date, custom_sql, dbs, files, msg)
 
