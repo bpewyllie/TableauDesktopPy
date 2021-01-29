@@ -110,8 +110,12 @@ class Workbook:
         Returns a list of fonts used in the workbook.
         """
 
-        font_search = self.xml.xpath("//format[@attr = 'font-family']")
-        fonts = list(set([font.attrib["value"].lower() for font in font_search]))
+        font_search1 = self.xml.xpath("//format[@attr = 'font-family']")
+        font_search2 = self.xml.xpath("//run[@fontname]")
+
+        fonts1 = [font.attrib["value"] for font in font_search1]
+        fonts2 = [font.attrib["fontname"] for font in font_search2]
+        fonts = list(set(fonts1 + fonts2))
 
         return fonts
 
@@ -327,22 +331,39 @@ class Workbook:
         for col in to_hide:
             col.attrib["hidden"] = str(hide).lower()
 
-    def change_fonts(self, font_dict: dict = None):
+    def change_fonts(self, default: str = "Arial", font_dict: dict = None):
         """
         Replaces fonts in workbook xml.
+        - default: default font to map all fonts to.
         - font_dict: mapping of current fonts to new fonts; if no font_dict is provided,
-        all fonts are changed to Arial.
+        all fonts are changed to default argument.
         """
 
         if font_dict == None:
-            fonts_to_change = self.xml.xpath("//format[@attr = 'font-family']")
 
-            for font in fonts_to_change:
-                font.attrib["value"] = "Arial"
+            fonts_1 = self.xml.xpath("//format[@attr = 'font-family']")
+            fonts_2 = self.xml.xpath("//run[@fontname]")
+
+            for font in fonts_1:
+                font.attrib["value"] = default
+
+            for font in fonts_2:
+                font.attrib["fontname"] = default
 
         else:
-            for font in font_dict.keys():
-                font.attrib["value"] = font_dict[font]
+
+            for old_font in font_dict.keys():
+
+                fonts_1 = self.xml.xpath(
+                    "//format[@attr = 'font-family' and @value = '{}']".format(old_font)
+                )
+                fonts_2 = self.xml.xpath("//run[@fontname = '{}']".format(old_font))
+
+                for font in fonts_1:
+                    font.attrib["value"] = font_dict[old_font]
+
+                for font in fonts_2:
+                    font.attrib["fontname"] = font_dict[old_font]
 
     def generate_readme(
         self, save: bool = False, filename: str = None, note: str = None
