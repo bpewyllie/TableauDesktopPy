@@ -474,18 +474,63 @@ class Workbook:
     def save(self, filename: str = None):
         """
         Exports xml to Tableau workbook file.
-        - filename: destination and name of the file. filename must end with '.twb'. If
-        no filename is provided, the method overwrites self.filename.
+        - filename: destination and name of the file. Both packaged and unpackaged
+        workbooks may be saved as ".twb" files, but only packaged workbooks may be
+        saved as ".twbx" files.
         """
 
         if filename == None:
             fn = self.filename
         else:
-            fn = filename
+            fn = os.path.normpath(filename)
 
+        # twb / twbx -> twb
         if fn.endswith(".twb"):
             tree = lxml.etree.ElementTree(self.xml)
             tree.write(fn)
 
+        # twbx -> twbx
+        elif fn.endswith(".twbx") and self.filename.endswith(".twbx"):
+
+            # create temp "[workbook name].twb files" folder for holding extracts
+            path = os.sep.join(fn.split(os.sep)[:-1])
+            name = fn.split(os.sep)[-1][:-1]
+
+            if not os.path.exists(path + os.sep + name + " files"):
+
+                os.mkdir(path=path + os.sep + name + " files")
+
+                # store extract data in folder
+                with open(self.filename, "rb") as twbx:
+
+                    zf = zipfile.ZipFile(twbx)
+                    package = [x for x in zf.namelist() if not x.endswith(".twb")]
+
+                    for p in package:
+                        zf.extract(p, path=path + os.sep + name + " files")
+
+            # create twb
+            tree = lxml.etree.ElementTree(self.xml)
+            tree.write(path + os.sep + name)
+
+            # gather all files to zip
+            all_files = []
+
+            for dirname, subdirs, files in os.walk(path):
+                for filename in files:
+                    all_files.append(os.path.join(dirname, filename))
+
+            files_to_zip = [
+                f
+                for f in all_files
+                if f.startswith(path + os.sep + name) and f.find(".twbx") == -1
+            ]
+
+            # zip twb with everything else
+            with zipfile.ZipFile(fn, "w", zipfile.ZIP_DEFLATED) as zip_writer:
+
+                for f in files_to_zip:
+                    zip_writer.write(f, arcname="." + os.sep + name + f.split(name)[-1])
+
         else:
-            print(filename, "does not have a .twb extension.")
+            raise NameError("Cannot save unpackaged workbooks as packaged workbooks!")
