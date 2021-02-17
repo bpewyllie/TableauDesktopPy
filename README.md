@@ -60,6 +60,14 @@ my_workbook = tdp.Workbook("C:\Users\bpewyllie\test_workbook.twbx")
 
 ## To do
 
+* Fix bugs with `generate_readme`:
+ 
+  * Don't show file extension in workbook name field
+
+  * Show 'N/A' if no external file connections
+
+* Fix bug with not capturing all fields in Workbook.fields
+
 * Create worksheet, datasource subclasses (long-term goal: allow more precise manipulation)
 
 * Create method for changing file paths of images and data files
