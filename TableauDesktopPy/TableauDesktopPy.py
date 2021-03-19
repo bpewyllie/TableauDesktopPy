@@ -18,7 +18,7 @@ class Workbook:
         self.xml = self._get_xml()
 
         self.custom_sql = self._get_custom_sql()
-        self.excel = self._get_excel()
+        self.files = self._get_files()
         self.onedrive = self._get_onedrive()
         self.connections = self._get_db_connections()
 
@@ -28,12 +28,17 @@ class Workbook:
         self.images = self._get_images()
         self.shapes = self._get_shapes()
 
-        self.fields = self._get_fields()
-        self.active_fields = self._get_active_fields()
-
     @property  # allow attribute to get value after calling hide fields method
     def hidden_fields(self):
         return self._get_hidden_fields()
+
+    @property
+    def active_fields(self):
+        return self._get_active_fields()
+
+    @property
+    def fields(self):
+        return self._get_fields()
 
     @property
     def fonts(self):
@@ -75,13 +80,13 @@ class Workbook:
 
         return queries
 
-    def _get_excel(self):
+    def _get_files(self):
         """
-        Returns a list of excel and csv connections in the workbook.
+        Returns a list of file connections in the workbook.
         """
 
         search = self.xml.xpath("//connection[@filename != '']")
-        files = list(set([xls.attrib["filename"] for xls in search]))
+        files = list(set([f.attrib["filename"] for f in search]))
 
         return files
 
@@ -256,26 +261,7 @@ class Workbook:
         Returns list of all fields and their datasources in the workbook.
         """
 
-        datasources = self.xml.xpath(
-            "//datasource[@caption and ./column[@caption or @name]]"
-        )
-        regex = r"^\[|\]\Z"  # replace brackets from field strings
-        fields = []
-
-        for d in datasources:
-
-            # return captions for calculated fields, otherwise return name
-            has_caption = d.xpath("./column[@caption and @name]")
-            all_cols = d.xpath("./column[@name]")
-
-            fields += [
-                (col.attrib["caption"], d.attrib["caption"]) for col in has_caption
-            ]
-            fields += [
-                (re.sub(regex, "", col.attrib["name"]), d.attrib["caption"])
-                for col in all_cols
-                if col not in has_caption
-            ]
+        fields = self.hidden_fields + self.active_fields
 
         return sorted(fields)
 
@@ -432,7 +418,7 @@ class Workbook:
 
         # items to fill (in order):
         # title, author, date, custom sql, db connections, file connections, note
-        title = self.filename.split(os.sep)[-1]
+        title = os.path.normpath(self.filename).split(os.sep)[-1]
 
         author = getpass.getuser()
 
@@ -446,9 +432,16 @@ class Workbook:
 
         # first element of c is name, second element is connection class (type)
         clean_dbs = ["{} ({})".format(c[0], c[1]) for c in self.connections]
-        dbs = "\n   - ".join(clean_dbs)
+        
+        if clean_dbs == []:
+            dbs = "\n   - N/A"
+        else:
+            dbs = "\n   - ".join(clean_dbs)
 
-        files = "\n   - ".join(self.excel)
+        if files == []:
+            files = "\n   - N/A"
+        else:
+            files = "\n   - ".join(self.files)
 
         if note == None:
             msg = "This documentation was generated automatically at {}".format(
