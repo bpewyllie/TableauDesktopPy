@@ -438,7 +438,7 @@ class Workbook:
         else:
             dbs = "\n   - ".join(clean_dbs)
 
-        if files == []:
+        if self.files == []:
             files = "\n   - N/A"
         else:
             files = "\n   - ".join(self.files)
