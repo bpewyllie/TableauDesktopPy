@@ -412,9 +412,8 @@ class Workbook:
         #template_file = pkg_resources.resource_filename(
         #    "TableauDesktopPy", "assets/README-twb.txt"
         #)
-        template_file = "C:\Users\Medewerker\Documents\GitHub\TableauDesktopPy\TableauDesktopPy\assets\README-twb.txt"
 
-        with open(template_file, "r") as readme_template:
+        with open(r"C:\Users\Medewerker\Documents\GitHub\TableauDesktopPy\TableauDesktopPy\assets\README-twb.txt", "r") as readme_template:
             text = readme_template.read()
 
         # items to fill (in order):
